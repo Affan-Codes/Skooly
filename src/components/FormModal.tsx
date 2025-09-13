@@ -10,19 +10,26 @@ import {
   useState,
 } from "react";
 import dynamic from "next/dynamic";
-import { deleteSubject } from "@/lib/actions";
+import {
+  deleteClass,
+  deleteExam,
+  deleteStudent,
+  deleteSubject,
+  deleteTeacher,
+} from "@/lib/actions";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { FormContainerProps } from "./FormContainer";
+import { Capitalize } from "@/lib/utils";
 
 const deleteActionMap = {
   subject: deleteSubject,
-  class: deleteSubject,
-  teacher: deleteSubject,
-  student: deleteSubject,
+  class: deleteClass,
+  teacher: deleteTeacher,
+  student: deleteStudent,
   parent: deleteSubject,
   lesson: deleteSubject,
-  exam: deleteSubject,
+  exam: deleteExam,
   assignment: deleteSubject,
   result: deleteSubject,
   attendance: deleteSubject,
@@ -38,6 +45,12 @@ const StudentForm = dynamic(() => import("./forms/StudentForm"), {
   loading: () => <h1>Loading...</h1>,
 });
 const SubjectForm = dynamic(() => import("./forms/SubjectForm"), {
+  loading: () => <h1>Loading...</h1>,
+});
+const ClassForm = dynamic(() => import("./forms/ClassForm"), {
+  loading: () => <h1>Loading...</h1>,
+});
+const ExamForm = dynamic(() => import("./forms/ExamForm"), {
   loading: () => <h1>Loading...</h1>,
 });
 
@@ -57,6 +70,14 @@ const forms: {
       relatedData={relatedData}
     />
   ),
+  class: (setOpen, type, data, relatedData) => (
+    <ClassForm
+      setOpen={setOpen}
+      type={type}
+      data={data}
+      relatedData={relatedData}
+    />
+  ),
   teacher: (setOpen, type, data, relatedData) => (
     <TeacherForm
       setOpen={setOpen}
@@ -67,6 +88,14 @@ const forms: {
   ),
   student: (setOpen, type, data, relatedData) => (
     <StudentForm
+      setOpen={setOpen}
+      type={type}
+      data={data}
+      relatedData={relatedData}
+    />
+  ),
+  exam: (setOpen, type, data, relatedData) => (
+    <ExamForm
       setOpen={setOpen}
       type={type}
       data={data}
@@ -102,7 +131,7 @@ const FormModal = ({
 
     useEffect(() => {
       if (state.success) {
-        toast(`Subject has been deleted!`);
+        toast(`${Capitalize(table)} has been deleted!`);
         router.refresh();
         setOpen(false);
       }
@@ -110,7 +139,7 @@ const FormModal = ({
 
     return type === "delete" && id ? (
       <form action={formAction} className="p-4 flex flex-col gap-4">
-        <input type="text | number" name="id" value={id} hidden />
+        <input type="text | number" name="id" value={id} hidden readOnly />
         <span className="text-center font-medium">
           All data will be lost. Are you sure you want to delete this {table}?
         </span>
