@@ -4,18 +4,18 @@ import { auth } from "@clerk/nextjs/server";
 
 export type FormContainerProps = {
   table:
-    | "teacher"
-    | "student"
-    | "subject"
-    | "parent"
-    | "class"
-    | "lesson"
-    | "exam"
-    | "assignment"
-    | "result"
-    | "attendance"
-    | "event"
-    | "announcement";
+  | "teacher"
+  | "student"
+  | "subject"
+  | "parent"
+  | "class"
+  | "lesson"
+  | "exam"
+  | "assignment"
+  | "result"
+  | "attendance"
+  | "event"
+  | "announcement";
   type: "create" | "update" | "delete";
   data?: any;
   id?: number | string;
@@ -25,7 +25,7 @@ const FormContainer = async ({ table, type, data, id }: FormContainerProps) => {
   let relatedData = {};
 
   const { userId, sessionClaims } = await auth();
-  const role = (sessionClaims?.metadata as { role?: string })?.role;
+  const role = (sessionClaims?.metadata as { role?: string; })?.role;
   const currentUserId = userId;
 
   if (type !== "delete") {
@@ -74,6 +74,48 @@ const FormContainer = async ({ table, type, data, id }: FormContainerProps) => {
         relatedData = { lessons: examLessons };
         break;
 
+      case "announcement":
+        const announcementClasses = await prisma.class.findMany({
+          select: {
+            id: true,
+            name: true,
+            grade: {
+              select: {
+                id: true,
+                level: true,
+              },
+            },
+          },
+        });
+        relatedData = { classes: announcementClasses };
+        break;
+
+      case "event":
+        const eventClasses = await prisma.class.findMany({
+          select: {
+            id: true,
+            name: true,
+            grade: {
+              select: {
+                id: true,
+                level: true,
+              },
+            },
+          },
+        });
+        relatedData = { classes: eventClasses };
+        break;
+
+      case "assignment":
+        const assignmentLessons = await prisma.lesson.findMany({
+          where: {
+            ...(role === "teacher" ? { teacherId: currentUserId! } : {}),
+          },
+          select: { id: true, name: true },
+        });
+        relatedData = { lessons: assignmentLessons };
+        break;
+
       default:
         break;
     }
@@ -82,11 +124,11 @@ const FormContainer = async ({ table, type, data, id }: FormContainerProps) => {
   return (
     <div>
       <FormModal
-        table={table}
-        type={type}
-        data={data}
-        id={id}
-        relatedData={relatedData}
+        table={ table }
+        type={ type }
+        data={ data }
+        id={ id }
+        relatedData={ relatedData }
       />
     </div>
   );

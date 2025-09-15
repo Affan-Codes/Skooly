@@ -72,11 +72,62 @@ export const studentSchema = z.object({
 });
 export type StudentSchema = z.infer<typeof studentSchema>;
 
-export const examSchema = z.object({
+export const examSchema = z
+  .object({
+    id: z.coerce.number().optional(),
+    title: z.string().min(1, { message: "Exam name is required!" }),
+    startTime: z.coerce.date({ message: "Start time is required!" }),
+    endTime: z.coerce.date({ message: "End time is required!" }),
+    lessonId: z.coerce.number({ message: "Lesson is required!" }),
+  })
+  .refine((data) => data.startTime < data.endTime, {
+    message: "Start time must be before end time!",
+    path: ["endTime"],
+  });
+export type ExamSchema = z.infer<typeof examSchema>;
+
+export const announcementSchema = z.object({
   id: z.coerce.number().optional(),
-  title: z.string().min(1, { message: "Exam name is required!" }),
+  title: z
+    .string()
+    .min(1, { message: "Title is required!" })
+    .max(100, { message: "Title too long!" }),
+  description: z.string().min(1, { message: "Description is required!" }),
+  date: z.coerce.date({ message: "Date is required!" }),
+  classId: z.preprocess((val) => {
+    if (val === "" || val === null || val === undefined) return null;
+    const num = Number(val);
+    return isNaN(num) ? null : num;
+  }, z.number().positive().nullable().optional()),
+});
+export type AnnouncementSchema = z.infer<typeof announcementSchema>;
+
+
+// EVENT
+
+export const eventSchema = z.object({
+  id: z.coerce.number().optional(),
+  title: z.string().min(1, { message: "Title is required!" }),
+  description: z.string().min(1, { message: "Description is required!" }),
   startTime: z.coerce.date({ message: "Start time is required!" }),
   endTime: z.coerce.date({ message: "End time is required!" }),
+  classId: z.preprocess((val) => {
+    if (val === "" || val === null || val === undefined || val === "0") {
+      return null;
+    }
+    return Number(val);
+  }, z.number().positive().nullable().optional()),
+});
+export type EventSchema = z.infer<typeof eventSchema>;
+
+
+// ASSIGNMENT
+
+export const assignmentSchema = z.object({
+  id: z.coerce.number().optional(),
+  title: z.string().min(1, { message: "Assignment title is required!" }),
+  startDate: z.coerce.date({ message: "Start date is required!" }),
+  dueDate: z.coerce.date({ message: "Due date is required!" }),
   lessonId: z.coerce.number({ message: "Lesson is required!" }),
 });
-export type ExamSchema = z.infer<typeof examSchema>;
+export type AssignmentSchema = z.infer<typeof assignmentSchema>;

@@ -1,81 +1,110 @@
-import FormModal from "@/components/FormModal";
+import FormContainer from "@/components/FormContainer";
 import Pagination from "@/components/Pagination";
 import Table from "@/components/Table";
 import TableSearch from "@/components/TableSearch";
 import prisma from "@/lib/prisma";
 import { ITEM_PER_PAGE } from "@/lib/settings";
-import { currentUserId, role } from "@/lib/utils";
-import { Assignment, Class, Prisma, Subject, Teacher } from "@prisma/client";
+import { auth } from "@clerk/nextjs/server";
+import { Assignment, Class, Grade, Lesson, Prisma, Subject, Teacher } from "@prisma/client";
 import Image from "next/image";
 
 type AssignmentList = Assignment & {
-  lesson: {
+  lesson: Lesson & {
     subject: Subject;
-    class: Class;
+    class: Class & { grade: Grade; };
     teacher: Teacher;
   };
 };
 
-const columns = [
-  {
-    header: "Subject Name",
-    accessor: "name",
-  },
-  {
-    header: "Class",
-    accessor: "class",
-  },
-  {
-    header: "Teacher",
-    accessor: "teacher",
-    className: "hidden md:table-cell",
-  },
-  {
-    header: "Due Date",
-    accessor: "dueDate",
-    className: "hidden md:table-cell",
-  },
-  ...(role === "admin" || role === "teacher"
-    ? [
+const AssignmentListPage = async ({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | undefined; };
+}) => {
+  const { userId, sessionClaims } = await auth();
+  const role = (sessionClaims?.metadata as { role?: string; })?.role;
+
+  const columns = [
+    {
+      header: "Title",
+      accessor: "title",
+    },
+    {
+      header: "Subject",
+      accessor: "name",
+    },
+    {
+      header: "Class",
+      accessor: "class",
+      className: "hidden md:table-cell",
+    },
+    {
+      header: "Teacher",
+      accessor: "teacher",
+      className: "hidden md:table-cell",
+    },
+    {
+      header: "Due Date",
+      accessor: "dueDate",
+      className: "hidden md:table-cell",
+    },
+    ...(role === "admin" || role === "teacher"
+      ? [
         {
           header: "Actions",
           accessor: "action",
         },
       ]
-    : []),
-];
+      : []),
+  ];
 
-const renderRow = (item: AssignmentList) => (
-  <tr
-    key={item.id}
-    className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight"
-  >
-    <td className="flex items-center gap-4 p-4">{item.lesson.subject.name}</td>
-    <td>{item.lesson.class.name}</td>
-    <td className="hidden md:table-cell">
-      {item.lesson.teacher.name + " " + item.lesson.teacher.surname}
-    </td>
-    <td className="hidden md:table-cell">
-      {new Intl.DateTimeFormat("en-In").format(item.dueDate)}
-    </td>
-    <td>
-      <div className="flex items-center gap-2">
-        {(role === "admin" || role === "teacher") && (
-          <>
-            <FormModal table="assignment" type="update" data={item} />
-            <FormModal table="assignment" type="delete" id={item.id} />
-          </>
-        )}
-      </div>
-    </td>
-  </tr>
-);
+  const renderRow = (item: AssignmentList) => (
+    <tr
+      key={ item.id }
+      className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight"
+    >
+      <td className="flex items-center gap-4 p-4">{ item.title }</td>
+      <td className="font-medium">{ item.lesson.subject.name }</td>
+      <td className="hidden md:table-cell">Grade { item.lesson.class.grade.level } - { item.lesson.class.name }</td>
+      <td className="hidden md:table-cell">
+        { item.lesson.teacher.name + " " + item.lesson.teacher.surname }
+      </td>
+      <td className="hidden md:table-cell">
+        <div className="flex flex-col">
+          <span className={ `text-sm font-medium ${new Date(item.dueDate) < new Date()
+            ? "text-red-600"
+            : new Date(item.dueDate).getTime() - new Date().getTime() < 24 * 60 * 60 * 1000
+              ? "text-orange-600"
+              : "text-green-600"
+            }` }>
+            { new Intl.DateTimeFormat("en-IN", {
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+            }).format(item.dueDate) }
+          </span>
+          <span className="text-xs text-gray-500">
+            { new Intl.DateTimeFormat("en-IN", {
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: true,
+            }).format(item.dueDate) }
+          </span>
+        </div>
+      </td>
+      <td>
+        <div className="flex items-center gap-2">
+          { (role === "admin" || role === "teacher") && (
+            <>
+              <FormContainer table="assignment" type="update" data={ item } />
+              <FormContainer table="assignment" type="delete" id={ item.id } />
+            </>
+          ) }
+        </div>
+      </td>
+    </tr>
+  );
 
-const AssignmentListPage = async ({
-  searchParams,
-}: {
-  searchParams: { [key: string]: string | undefined };
-}) => {
   const params = await searchParams;
   const { page, ...queryParams } = params;
 
@@ -95,10 +124,24 @@ const AssignmentListPage = async ({
           case "teacherId":
             query.lesson.teacherId = value;
             break;
+          case "subjectId":
+            query.lesson.subjectId = parseInt(value);
+            break;
           case "search":
-            query.lesson.subject = {
-              name: { contains: value, mode: "insensitive" },
-            };
+            query.OR = [
+              { title: { contains: value, mode: "insensitive" } },
+              { lesson: { subject: { name: { contains: value, mode: "insensitive" } } } },
+              {
+                lesson: {
+                  teacher: {
+                    OR: [
+                      { name: { contains: value, mode: "insensitive" } },
+                      { surname: { contains: value, mode: "insensitive" } }
+                    ]
+                  }
+                }
+              }
+            ];
             break;
           default:
             break;
@@ -112,17 +155,52 @@ const AssignmentListPage = async ({
     case "admin":
       break;
     case "teacher":
-      query.lesson.teacherId = currentUserId!;
+      const teacherCondition = { lesson: { teacherId: userId! } };
+      if (query.OR) {
+        query.AND = [
+          { OR: query.OR },
+          teacherCondition
+        ];
+        delete query.OR;
+      } else {
+        Object.assign(query, teacherCondition);
+      }
       break;
     case "student":
-      query.lesson.class = {
-        students: { some: { id: currentUserId! } },
+      const studentCondition = {
+        lesson: {
+          class: {
+            students: { some: { id: userId! } }
+          }
+        }
       };
+      if (query.OR) {
+        query.AND = [
+          { OR: query.OR },
+          studentCondition
+        ];
+        delete query.OR;
+      } else {
+        Object.assign(query, studentCondition);
+      }
       break;
     case "parent":
-      query.lesson.class = {
-        students: { some: { parentId: currentUserId! } },
+      const parentCondition = {
+        lesson: {
+          class: {
+            students: { some: { parentId: userId! } }
+          }
+        }
       };
+      if (query.OR) {
+        query.AND = [
+          { OR: query.OR },
+          parentCondition
+        ];
+        delete query.OR;
+      } else {
+        Object.assign(query, parentCondition);
+      }
       break;
     default:
       break;
@@ -141,11 +219,12 @@ const AssignmentListPage = async ({
               select: { name: true, surname: true },
             },
             class: {
-              select: { name: true },
+              select: { name: true, grade: { select: { level: true } } },
             },
           },
         },
       },
+      orderBy: { dueDate: "asc" },
       take: ITEM_PER_PAGE,
       skip: ITEM_PER_PAGE * (p - 1),
     }),
@@ -154,7 +233,7 @@ const AssignmentListPage = async ({
 
   return (
     <div className="bg-white p-4 rounded-md flex-1 m-4 mt-0">
-      {/* TOP */}
+      {/* TOP */ }
       <div className="flex items-center justify-between">
         <h1 className="hidden md:block text-lg font-semibold">
           All Assignments
@@ -163,21 +242,21 @@ const AssignmentListPage = async ({
           <TableSearch />
           <div className="flex items-center gap-4 self-end">
             <button className="w-8 h-8 flex items-center justify-center rounded-full bg-lamaYellow">
-              <Image src="/filter.png" alt="" width={14} height={14} />
+              <Image src="/filter.png" alt="" width={ 14 } height={ 14 } />
             </button>
             <button className="w-8 h-8 flex items-center justify-center rounded-full bg-lamaYellow">
-              <Image src="/sort.png" alt="" width={14} height={14} />
+              <Image src="/sort.png" alt="" width={ 14 } height={ 14 } />
             </button>
-            {(role === "admin" || role === "teacher") && (
-              <FormModal table="assignment" type="create" />
-            )}
+            { (role === "admin" || role === "teacher") && (
+              <FormContainer table="assignment" type="create" />
+            ) }
           </div>
         </div>
       </div>
-      {/* LIST */}
-      <Table columns={columns} renderRow={renderRow} data={data} />
-      {/* PAGINATION */}
-      <Pagination page={p} count={count} />
+      {/* LIST */ }
+      <Table columns={ columns } renderRow={ renderRow } data={ data } />
+      {/* PAGINATION */ }
+      <Pagination page={ p } count={ count } />
     </div>
   );
 };

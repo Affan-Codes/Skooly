@@ -49,6 +49,39 @@ export const adjustScheduleToCurrentWeek = (
   });
 };
 
+export function formatDateTimeForInput(
+  dateTime: Date | string | undefined
+): string {
+  if (!dateTime) return "";
+
+  let dateString: string;
+
+  // Handle both Date objects and strings from database
+  if (dateTime instanceof Date) {
+    dateString = dateTime.toISOString();
+  } else {
+    dateString = dateTime.toString();
+  }
+
+  // If database returns "2025-09-17 05:00:00" format (space instead of T)
+  // Convert it to proper ISO format and treat as UTC
+  if (dateString.includes(" ") && !dateString.includes("T")) {
+    dateString = dateString.replace(" ", "T") + "Z";
+  }
+
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return "";
+
+  // Get local time components (JavaScript auto-converts UTC to local)
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
+}
+
 export const Capitalize = (str: string) => {
   return str.charAt(0).toUpperCase() + str.slice(1);
 };

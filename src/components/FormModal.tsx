@@ -11,7 +11,10 @@ import {
 } from "react";
 import dynamic from "next/dynamic";
 import {
+  deleteAnnouncement,
+  deleteAssignment,
   deleteClass,
+  deleteEvent,
   deleteExam,
   deleteStudent,
   deleteSubject,
@@ -30,11 +33,11 @@ const deleteActionMap = {
   parent: deleteSubject,
   lesson: deleteSubject,
   exam: deleteExam,
-  assignment: deleteSubject,
+  assignment: deleteAssignment,
   result: deleteSubject,
   attendance: deleteSubject,
-  event: deleteSubject,
-  announcement: deleteSubject,
+  event: deleteEvent,
+  announcement: deleteAnnouncement,
 };
 
 //LAZY LOADING
@@ -53,6 +56,15 @@ const ClassForm = dynamic(() => import("./forms/ClassForm"), {
 const ExamForm = dynamic(() => import("./forms/ExamForm"), {
   loading: () => <h1>Loading...</h1>,
 });
+const AnnouncementForm = dynamic(() => import("./forms/AnnouncementForm"), {
+  loading: () => <h1>Loading...</h1>,
+});
+const EventForm = dynamic(() => import("./forms/EventForm"), {
+  loading: () => <h1>Loading...</h1>,
+});
+const AssignmentForm = dynamic(() => import("./forms/AssignmentForm"), {
+  loading: () => <h1>Loading...</h1>,
+});
 
 const forms: {
   [key: string]: (
@@ -64,42 +76,66 @@ const forms: {
 } = {
   subject: (setOpen, type, data, relatedData) => (
     <SubjectForm
-      setOpen={setOpen}
-      type={type}
-      data={data}
-      relatedData={relatedData}
+      setOpen={ setOpen }
+      type={ type }
+      data={ data }
+      relatedData={ relatedData }
     />
   ),
   class: (setOpen, type, data, relatedData) => (
     <ClassForm
-      setOpen={setOpen}
-      type={type}
-      data={data}
-      relatedData={relatedData}
+      setOpen={ setOpen }
+      type={ type }
+      data={ data }
+      relatedData={ relatedData }
     />
   ),
   teacher: (setOpen, type, data, relatedData) => (
     <TeacherForm
-      setOpen={setOpen}
-      type={type}
-      data={data}
-      relatedData={relatedData}
+      setOpen={ setOpen }
+      type={ type }
+      data={ data }
+      relatedData={ relatedData }
     />
   ),
   student: (setOpen, type, data, relatedData) => (
     <StudentForm
-      setOpen={setOpen}
-      type={type}
-      data={data}
-      relatedData={relatedData}
+      setOpen={ setOpen }
+      type={ type }
+      data={ data }
+      relatedData={ relatedData }
     />
   ),
   exam: (setOpen, type, data, relatedData) => (
     <ExamForm
-      setOpen={setOpen}
-      type={type}
-      data={data}
-      relatedData={relatedData}
+      setOpen={ setOpen }
+      type={ type }
+      data={ data }
+      relatedData={ relatedData }
+    />
+  ),
+  announcement: (setOpen, type, data, relatedData) => (
+    <AnnouncementForm
+      setOpen={ setOpen }
+      type={ type }
+      data={ data }
+      relatedData={ relatedData }
+    />
+  ),
+  event: (setOpen, type, data, relatedData) => (
+    <EventForm
+      setOpen={ setOpen }
+      type={ type }
+      data={ data }
+      relatedData={ relatedData }
+    />
+  ),
+  assignment: (setOpen, type, data, relatedData) => (
+    <AssignmentForm
+      setOpen={ setOpen }
+      type={ type }
+      data={ data }
+      relatedData={ relatedData }
     />
   ),
 };
@@ -110,14 +146,14 @@ const FormModal = ({
   data,
   id,
   relatedData,
-}: FormContainerProps & { relatedData?: any }) => {
+}: FormContainerProps & { relatedData?: any; }) => {
   const size = type === "create" ? "w-8 h-8" : "w-7 h-7";
   const bgColor =
     type === "create"
       ? "bg-lamaYellow"
       : type === "update"
-      ? "bg-lamaSky"
-      : "bg-lamaPurple";
+        ? "bg-lamaSky"
+        : "bg-lamaPurple";
 
   const [open, setOpen] = useState(false);
 
@@ -138,10 +174,10 @@ const FormModal = ({
     }, [state]);
 
     return type === "delete" && id ? (
-      <form action={formAction} className="p-4 flex flex-col gap-4">
-        <input type="text | number" name="id" value={id} hidden readOnly />
+      <form action={ formAction } className="p-4 flex flex-col gap-4">
+        <input type="text | number" name="id" value={ id } hidden readOnly />
         <span className="text-center font-medium">
-          All data will be lost. Are you sure you want to delete this {table}?
+          All data will be lost. Are you sure you want to delete this { table }?
         </span>
         <button className="bg-red-700 text-white py-2 px-4 rounded-md border-none max-w self-center">
           Delete
@@ -157,25 +193,25 @@ const FormModal = ({
   return (
     <>
       <button
-        className={`${size} flex items-center justify-center rounded-full ${bgColor}`}
-        onClick={() => setOpen(true)}
+        className={ `${size} flex items-center justify-center rounded-full ${bgColor}` }
+        onClick={ () => setOpen(true) }
       >
-        <Image src={`/${type}.png`} alt="" width={16} height={16} />
+        <Image src={ `/${type}.png` } alt="" width={ 16 } height={ 16 } />
       </button>
-      {open && (
+      { open && (
         <div className="w-screen min-h-screen absolute left-0 top-0 bg-black/60 z-50 flex items-center justify-center">
           <div className="bg-white p-4 rounded-md relative w-[90%] md:w-[70%] lg:w-[60%] xl:w-[50%] 2xl:w-[40%]">
             <div
               className="absolute top-4 right-4 cursor-pointer"
-              onClick={() => setOpen(false)}
+              onClick={ () => setOpen(false) }
             >
-              <Image src="/close.png" alt="" width={14} height={14} />
+              <Image src="/close.png" alt="" width={ 14 } height={ 14 } />
             </div>
 
             <Form />
           </div>
         </div>
-      )}
+      ) }
     </>
   );
 };

@@ -2,7 +2,12 @@
 
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import {
+  announcementSchema,
+  AnnouncementSchema,
+  AssignmentSchema,
   ClassSchema,
+  EventSchema,
+  eventSchema,
   ExamSchema,
   StudentSchema,
   SubjectSchema,
@@ -556,6 +561,286 @@ export const deleteExam = async (
   const id = data.get("id") as string;
   try {
     await prisma.exam.delete({
+      where: {
+        id: parseInt(id),
+      },
+    });
+
+    return { success: true, error: false };
+  } catch (err) {
+    console.log(err);
+    return { success: false, error: true };
+  }
+};
+
+// Announcement
+
+export const createAnnouncement = async (
+  currentState: CurrentState,
+  data: AnnouncementSchema
+) => {
+  try {
+    const validatedData = announcementSchema.parse(data);
+
+    await prisma.announcement.create({
+      data: {
+        title: validatedData.title,
+        description: validatedData.description,
+        date: validatedData.date,
+        classId: validatedData.classId || null,
+      },
+    });
+
+    return { success: true, error: false };
+  } catch (error) {
+    console.error("Error creating announcement:", error);
+    return { success: false, error: true };
+  }
+};
+
+export const updateAnnouncement = async (
+  currentState: CurrentState,
+  data: AnnouncementSchema
+) => {
+  try {
+    const validatedData = announcementSchema.parse(data);
+
+    if (!validatedData.id) {
+      throw new Error("Announcement ID is required for update");
+    }
+
+    const existingAnnouncement = await prisma.announcement.findUnique({
+      where: { id: validatedData.id },
+    });
+
+    if (!existingAnnouncement) {
+      throw new Error("Announcement not found");
+    }
+
+    await prisma.announcement.update({
+      where: {
+        id: validatedData.id,
+      },
+      data: {
+        title: validatedData.title,
+        description: validatedData.description,
+        date: validatedData.date,
+        classId: validatedData.classId || null,
+      },
+    });
+
+    return { success: true, error: false };
+  } catch (error) {
+    console.error("Error updating announcement:", error);
+    return { success: false, error: true };
+  }
+};
+
+export const deleteAnnouncement = async (
+  currentState: CurrentState,
+  data: FormData
+) => {
+  const id = data.get("id") as string;
+  try {
+    if (!id) {
+      throw new Error("Announcement ID is required");
+    }
+
+    const existingAnnouncement = await prisma.announcement.findUnique({
+      where: { id: parseInt(id) },
+    });
+
+    if (!existingAnnouncement) {
+      throw new Error("Announcement not found");
+    }
+
+    await prisma.announcement.delete({
+      where: {
+        id: parseInt(id),
+      },
+    });
+
+    return { success: true, error: false };
+  } catch (error) {
+    console.error("Error deleting announcement:", error);
+    return { success: false, error: true };
+  }
+};
+
+// Event
+
+export const createEvent = async (
+  currentState: CurrentState,
+  data: EventSchema
+) => {
+  try {
+    const validatedData = eventSchema.parse(data);
+
+    if (validatedData.endTime <= validatedData.startTime) {
+      console.error("End time must be after start time");
+      return { success: false, error: true };
+    }
+
+    await prisma.event.create({
+      data: {
+        title: validatedData.title,
+        description: validatedData.description,
+        startTime: validatedData.startTime,
+        endTime: validatedData.endTime,
+        classId: validatedData.classId || null,
+      },
+    });
+
+    return { success: true, error: false };
+  } catch (error) {
+    console.error("Error creating event:", error);
+    return { success: false, error: true };
+  }
+};
+
+export const updateEvent = async (
+  currentState: CurrentState,
+  data: EventSchema
+) => {
+  try {
+    const validatedData = eventSchema.parse(data);
+
+    if (!validatedData.id) {
+      throw new Error("Event ID is required for update");
+    }
+
+    if (validatedData.endTime <= validatedData.startTime) {
+      console.error("End time must be after start time");
+      return { success: false, error: true };
+    }
+
+    const existingEvent = await prisma.event.findUnique({
+      where: { id: validatedData.id },
+    });
+
+    if (!existingEvent) {
+      throw new Error("Event not found");
+    }
+
+    await prisma.event.update({
+      where: {
+        id: validatedData.id,
+      },
+      data: {
+        title: validatedData.title,
+        description: validatedData.description,
+        startTime: validatedData.startTime,
+        endTime: validatedData.endTime,
+        classId: validatedData.classId || null,
+      },
+    });
+
+    return { success: true, error: false };
+  } catch (error) {
+    console.error("Error updating event:", error);
+    return { success: false, error: true };
+  }
+};
+
+export const deleteEvent = async (
+  currentState: CurrentState,
+  data: FormData
+) => {
+  const id = data.get("id") as string;
+  try {
+    if (!id) {
+      throw new Error("Event ID is required");
+    }
+
+    const existingEvent = await prisma.event.findUnique({
+      where: { id: parseInt(id) },
+    });
+
+    if (!existingEvent) {
+      throw new Error("Event not found");
+    }
+
+    await prisma.event.delete({
+      where: {
+        id: parseInt(id),
+      },
+    });
+
+    return { success: true, error: false };
+  } catch (error) {
+    console.error("Error deleting event:", error);
+    return { success: false, error: true };
+  }
+};
+
+// Assignment
+
+export const createAssignment = async (
+  currentState: CurrentState,
+  data: AssignmentSchema
+) => {
+  try {
+    const { userId, sessionClaims } = await auth();
+    const role = (sessionClaims?.metadata as { role?: string })?.role;
+
+    if (role === "teacher") {
+      const teacherLesson = await prisma.lesson.findFirst({
+        where: {
+          teacherId: userId!,
+          id: data.lessonId,
+        },
+      });
+
+      if (!teacherLesson) {
+        return { success: false, error: true };
+      }
+    }
+
+    await prisma.assignment.create({
+      data: {
+        title: data.title,
+        startDate: data.startDate,
+        dueDate: data.dueDate,
+        lessonId: data.lessonId,
+      },
+    });
+
+    return { success: true, error: false };
+  } catch (error) {
+    console.error("Error deleting event:", error);
+    return { success: false, error: true };
+  }
+};
+
+export const updateAssignment = async (
+  currentState: CurrentState,
+  data: AssignmentSchema
+) => {
+  try {
+    await prisma.assignment.update({
+      where: { id: data.id },
+      data: {
+        title: data.title,
+        startDate: data.startDate,
+        dueDate: data.dueDate,
+        lessonId: data.lessonId,
+      },
+    });
+
+    return { success: true, error: false };
+  } catch (err) {
+    console.log(err);
+    return { success: false, error: true };
+  }
+};
+
+export const deleteAssignment = async (
+  currentState: CurrentState,
+  data: FormData
+) => {
+  const id = data.get("id") as string;
+  try {
+    await prisma.assignment.delete({
       where: {
         id: parseInt(id),
       },
