@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Resolver, useForm } from "react-hook-form";
 import InputField from "../InputField";
 import { eventSchema, type EventSchema } from "@/lib/formValidationSchemas";
-import { createEvent, updateEvent } from "@/lib/actions";
+import { createEvent, updateEvent } from "@/actions/eventActions";
 import {
   Dispatch,
   SetStateAction,
@@ -157,3 +157,5 @@ const EventForm = ({
 };
 
 export default EventForm;
+
+// PASS

@@ -205,3 +205,5 @@ const EventListPage = async ({
 };
 
 export default EventListPage;
+
+// PASS

@@ -85,3 +85,5 @@ export function formatDateTimeForInput(
 export const Capitalize = (str: string) => {
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
+
+export type CurrentState = { success: boolean; error: boolean };
