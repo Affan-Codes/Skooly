@@ -30,7 +30,7 @@ const AssignmentListPage = async ({
       accessor: "title",
     },
     {
-      header: "Subject",
+      header: "Subject & Lesson",
       accessor: "name",
     },
     {
@@ -64,7 +64,12 @@ const AssignmentListPage = async ({
       className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight"
     >
       <td className="flex items-center gap-4 p-4">{ item.title }</td>
-      <td className="font-medium">{ item.lesson.subject.name }</td>
+      <td className="font-medium">
+        <div className="flex flex-col gap-1">
+          <span>{ item.lesson.subject.name }</span>
+          <span className="text-xs text-gray-500">{ item.lesson.name }</span>
+        </div>
+      </td>
       <td className="hidden md:table-cell">Grade { item.lesson.class.grade.level } - { item.lesson.class.name }</td>
       <td className="hidden md:table-cell">
         { item.lesson.teacher.name + " " + item.lesson.teacher.surname }
@@ -212,6 +217,7 @@ const AssignmentListPage = async ({
       include: {
         lesson: {
           select: {
+            name: true,
             subject: {
               select: { name: true },
             },
@@ -262,3 +268,5 @@ const AssignmentListPage = async ({
 };
 
 export default AssignmentListPage;
+
+// PASS

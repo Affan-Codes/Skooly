@@ -102,7 +102,6 @@ export const announcementSchema = z.object({
 });
 export type AnnouncementSchema = z.infer<typeof announcementSchema>;
 
-
 // EVENT
 
 export const eventSchema = z.object({
@@ -120,13 +119,12 @@ export const eventSchema = z.object({
 });
 export type EventSchema = z.infer<typeof eventSchema>;
 
-
 // ASSIGNMENT
 
 export const assignmentSchema = z.object({
   id: z.coerce.number().optional(),
   title: z.string().min(1, { message: "Assignment title is required!" }),
-  startDate: z.coerce.date({ message: "Start date is required!" }),
+  startDate: z.coerce.date().optional(),
   dueDate: z.coerce.date({ message: "Due date is required!" }),
   lessonId: z.coerce.number({ message: "Lesson is required!" }),
 });

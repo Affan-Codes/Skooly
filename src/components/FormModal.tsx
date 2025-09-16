@@ -10,20 +10,18 @@ import {
   useState,
 } from "react";
 import dynamic from "next/dynamic";
-import {
-  deleteAnnouncement,
-  deleteAssignment,
-  deleteClass,
-  deleteEvent,
-  deleteExam,
-  deleteStudent,
-  deleteSubject,
-  deleteTeacher,
-} from "@/lib/actions";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { FormContainerProps } from "./FormContainer";
 import { Capitalize } from "@/lib/utils";
+import { deleteSubject } from "@/actions/subjectActions";
+import { deleteClass } from "@/actions/classActions";
+import { deleteTeacher } from "@/actions/teacherActions";
+import { deleteStudent } from "@/actions/studentActions";
+import { deleteExam } from "@/actions/examActions";
+import { deleteAssignment } from "@/actions/assignmentActions";
+import { deleteEvent } from "@/actions/eventActions";
+import { deleteAnnouncement } from "@/actions/announcementActions";
 
 const deleteActionMap = {
   subject: deleteSubject,
