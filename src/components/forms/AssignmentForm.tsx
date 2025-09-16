@@ -51,7 +51,7 @@ const AssignmentForm = ({
 
   const onSubmit = handleSubmit((data) => {
     const payload = {
-      ...data, ...(type === "create" && { startDate: new Date() }),
+      ...data, startDate: data.startDate || new Date(),
       lessonId: Number(data.lessonId)
     };
 
