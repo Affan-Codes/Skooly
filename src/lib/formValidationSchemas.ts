@@ -1,3 +1,4 @@
+import { Day } from "@prisma/client";
 import { z } from "zod";
 
 export const subjectSchema = z.object({
@@ -131,3 +132,66 @@ export const assignmentSchema = z.object({
   lessonId: z.coerce.number({ message: "Lesson is required!" }),
 });
 export type AssignmentSchema = z.infer<typeof assignmentSchema>;
+
+// LESSON
+
+export const lessonSchema = z
+  .object({
+    id: z.string().optional(),
+    name: z.string().min(1, { message: "Lesson name is required!" }),
+    day: z.enum(Day, { message: "Day is required!" }),
+    startTime: z.string().min(1, { message: "Start time is required!" }),
+    endTime: z.string().min(1, { message: "End time is required!" }),
+    subjectId: z.string().min(1, { message: "Subject is required!" }),
+    classId: z.string().min(1, { message: "Class is required!" }),
+    teacherId: z.string().min(1, { message: "Teacher is required!" }),
+  })
+  .refine(
+    (data) => {
+      const startTime = new Date(data.startTime);
+      const endTime = new Date(data.endTime);
+      return endTime > startTime;
+    },
+    {
+      message: "End time must be after start time!",
+      path: ["endTime"],
+    }
+  )
+  .refine(
+    (data) => {
+      const startTime = new Date(data.startTime);
+      const endTime = new Date(data.endTime);
+
+      // Check if both times are on the same day
+      const startDate = startTime.toDateString();
+      const endDate = endTime.toDateString();
+
+      return startDate === endDate;
+    },
+    {
+      message: "Start and end time must be on the same day!",
+      path: ["endTime"],
+    }
+  )
+  .refine(
+    (data) => {
+      const startTime = new Date(data.startTime);
+      const endTime = new Date(data.endTime);
+
+      // Check if start time is between 8 AM (08:00) and 5 PM (17:00)
+      const startHour = startTime.getHours();
+      const endHour = endTime.getHours();
+      const endMinutes = endTime.getMinutes();
+
+      // End time can be exactly 17:00 (5 PM) but not after
+      const isValidStart = startHour >= 8 && startHour < 17;
+      const isValidEnd = endHour < 17 || (endHour === 17 && endMinutes === 0);
+
+      return isValidStart && isValidEnd;
+    },
+    {
+      message: "Lessons must be scheduled between 8:00 AM and 5:00 PM!",
+      path: ["startTime"],
+    }
+  );
+export type LessonSchema = z.infer<typeof lessonSchema>;
