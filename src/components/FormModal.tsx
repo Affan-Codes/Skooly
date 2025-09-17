@@ -13,7 +13,7 @@ import dynamic from "next/dynamic";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { FormContainerProps } from "./FormContainer";
-import { Capitalize } from "@/lib/utils";
+import { Capitalize, CurrentState } from "@/lib/utils";
 import { deleteSubject } from "@/actions/subjectActions";
 import { deleteClass } from "@/actions/classActions";
 import { deleteTeacher } from "@/actions/teacherActions";
@@ -156,9 +156,10 @@ const FormModal = ({
   const [open, setOpen] = useState(false);
 
   const Form = () => {
-    const [state, formAction] = useActionState(deleteActionMap[table], {
+    const [state, formAction] = useActionState<CurrentState, FormData>(deleteActionMap[table], {
       success: false,
       error: false,
+      message: undefined
     });
 
     const router = useRouter();
@@ -169,7 +170,14 @@ const FormModal = ({
         router.refresh();
         setOpen(false);
       }
-    }, [state]);
+      if (state.error) {
+        if (state.message) {
+          toast.error(state.message);
+        } else {
+          toast.error("Something went wrong!");
+        }
+      }
+    }, [state, router, table]);
 
     return type === "delete" && id ? (
       <form action={ formAction } className="p-4 flex flex-col gap-4">
@@ -177,7 +185,7 @@ const FormModal = ({
         <span className="text-center font-medium">
           All data will be lost. Are you sure you want to delete this { table }?
         </span>
-        <button className="bg-red-700 text-white py-2 px-4 rounded-md border-none max-w self-center">
+        <button className="bg-red-700 text-white py-2 px-4 rounded-md border-none w-max self-center">
           Delete
         </button>
       </form>
