@@ -10,6 +10,7 @@ import Image from "next/image";
 
 type ExamList = Exam & {
   lesson: {
+    name: string;
     subject: Subject;
     class: Class;
     teacher: Teacher;
@@ -26,12 +27,17 @@ const ExamListPage = async ({
 
   const columns = [
     {
-      header: "Subject Name",
+      header: "Title",
+      accessor: "title",
+    },
+    {
+      header: "Subject & Lesson",
       accessor: "name",
     },
     {
       header: "Class",
       accessor: "class",
+      className: "hidden md:table-cell",
     },
     {
       header: "Teacher",
@@ -59,17 +65,35 @@ const ExamListPage = async ({
       className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight"
     >
       <td className="flex items-center gap-4 p-4">
-        { item.lesson.subject.name }
+        { item.title }
       </td>
-      <td>{ item.lesson.class.name }</td>
+      <td className="font-medium">
+        <div className="flex flex-col gap-1">
+          <span>{ item.lesson.subject.name }</span>
+          <span className="text-xs text-gray-500">{ item.lesson.name }</span>
+        </div>
+      </td>
+      <td className="hidden md:table-cell">{ item.lesson.class.name }</td>
       <td className="hidden md:table-cell">
         { item.lesson.teacher.name + " " + item.lesson.teacher.surname }
       </td>
       <td className="hidden md:table-cell">
-        { new Intl.DateTimeFormat("en-IN", {
-          dateStyle: "medium",
-          timeStyle: "short",
-        }).format(item.startTime) }
+        <div className="flex flex-col">
+          <span className="text-sm font-medium">
+            { new Intl.DateTimeFormat("en-IN", {
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+            }).format(item.startTime) }
+          </span>
+          <span className="text-xs text-gray-500">
+            { new Intl.DateTimeFormat("en-IN", {
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: true,
+            }).format(item.startTime) }
+          </span>
+        </div>
       </td>
       <td>
         <div className="flex items-center gap-2">
@@ -104,9 +128,21 @@ const ExamListPage = async ({
             query.lesson.teacherId = value;
             break;
           case "search":
-            query.lesson.subject = {
-              name: { contains: value, mode: "insensitive" },
-            };
+            query.OR = [
+              { title: { contains: value, mode: "insensitive" } },
+              { lesson: { subject: { name: { contains: value, mode: "insensitive" } } } },
+              { lesson: { name: { contains: value, mode: "insensitive" } } },
+              {
+                lesson: {
+                  teacher: {
+                    OR: [
+                      { name: { contains: value, mode: "insensitive" } },
+                      { surname: { contains: value, mode: "insensitive" } }
+                    ]
+                  }
+                }
+              }
+            ];
             break;
           default:
             break;
@@ -146,6 +182,7 @@ const ExamListPage = async ({
       include: {
         lesson: {
           select: {
+            name: true,
             subject: {
               select: { name: true },
             },
@@ -193,3 +230,5 @@ const ExamListPage = async ({
 };
 
 export default ExamListPage;
+
+// PASS

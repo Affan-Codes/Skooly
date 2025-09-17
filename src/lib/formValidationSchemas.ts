@@ -86,6 +86,8 @@ export const examSchema = z
   });
 export type ExamSchema = z.infer<typeof examSchema>;
 
+// ANNOUNCEMENT
+
 export const announcementSchema = z.object({
   id: z.coerce.number().optional(),
   title: z

@@ -10,8 +10,9 @@ import {
   startTransition,
   useActionState,
   useEffect,
+  useState,
 } from "react";
-import { createExam, updateExam } from "@/lib/actions";
+import { createExam, updateExam } from "@/actions/examActions";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { formatDateTimeForInput } from "@/lib/utils";
@@ -27,10 +28,16 @@ const ExamForm = ({
   setOpen: Dispatch<SetStateAction<boolean>>;
   relatedData?: any;
 }) => {
+
+  const [selectedSubject, setSelectedSubject] = useState<string>(
+    data?.lesson?.subject?.id?.toString() || ""
+  );
+
   const {
     register,
     handleSubmit,
     formState: { errors },
+    setValue
   } = useForm<ExamSchema>({
     resolver: zodResolver(examSchema) as Resolver<ExamSchema>,
   });
@@ -44,9 +51,12 @@ const ExamForm = ({
   });
 
   const onSubmit = handleSubmit((formData) => {
+    const payload = {
+      ...formData, lessonId: Number(formData.lessonId)
+    };
 
     startTransition(() => {
-      formAction(formData);
+      formAction(payload);
     });
   });
 
@@ -60,7 +70,16 @@ const ExamForm = ({
     }
   }, [state, router, type, setOpen]);
 
-  const { lessons } = relatedData;
+  const { subjects, lessons } = relatedData || {};
+
+  const filteredLessons = lessons?.filter((lesson: any) =>
+    selectedSubject && lesson.subjectId && lesson.subjectId.toString() === selectedSubject
+  ) || [];
+
+  const handleSubjectChange = (subjectId: string) => {
+    setSelectedSubject(subjectId);
+    setValue("lessonId", undefined as any);
+  };
 
   return (
     <form className="flex flex-col gap-8" onSubmit={ onSubmit }>
@@ -101,14 +120,37 @@ const ExamForm = ({
             hidden
           />
         ) }
+
         <div className="flex flex-col gap-2 w-full md:w-1/4">
-          <label className="text-xs text-gray-500">Lessons</label>
+          <label className="text-xs text-gray-500">Subject</label>
           <select
             className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
-            { ...register("lessonId") }
-            defaultValue={ data?.lessonId }
+            value={ selectedSubject }
+            onChange={ (e) => handleSubjectChange(e.target.value) }
           >
-            { lessons.map((lesson: { id: number; name: string; }) => (
+            <option value="">Select Subject</option>
+            { subjects?.map((subject: { id: number; name: string; }) => (
+              <option value={ subject.id } key={ subject.id }>
+                { subject.name }
+              </option>
+            )) }
+          </select>
+        </div>
+        <div className="flex flex-col gap-2 w-full md:w-1/4">
+          <label className="text-xs text-gray-500">Lesson</label>
+          <select
+            className={ `ring-[1.5px] p-2 rounded-md text-sm w-full ${!selectedSubject
+                ? "ring-gray-200 bg-gray-100 cursor-not-allowed"
+                : "ring-gray-300"
+              }` }
+            { ...register("lessonId") }
+            defaultValue={ data?.lessonId || "" }
+            disabled={ !selectedSubject }
+          >
+            <option value="">
+              { !selectedSubject ? "Select Subject First" : "Select Lesson" }
+            </option>
+            { filteredLessons.map((lesson: { id: number; name: string; }) => (
               <option value={ lesson.id } key={ lesson.id }>
                 { lesson.name }
               </option>
@@ -132,3 +174,5 @@ const ExamForm = ({
 };
 
 export default ExamForm;
+
+// PASS
