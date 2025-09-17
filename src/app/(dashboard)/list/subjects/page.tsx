@@ -180,3 +180,5 @@ const SubjectListPage = async ({
 };
 
 export default SubjectListPage;
+
+// PASS
