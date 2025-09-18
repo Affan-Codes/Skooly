@@ -195,3 +195,36 @@ export const lessonSchema = z
     }
   );
 export type LessonSchema = z.infer<typeof lessonSchema>;
+
+// RESULT
+
+export const resultSchema = z
+  .object({
+    id: z.number().optional(),
+    score: z
+      .union([z.string().min(1, "Score is required!"), z.number()])
+      .refine((val) => {
+        const num = typeof val === "string" ? parseInt(val) : val;
+        return !isNaN(num) && num >= 0 && num <= 100;
+      }, "Score must be between 0 and 100!"),
+    studentId: z.string().min(1, "Student is required!"),
+    examId: z.union([z.string(), z.number()]).optional().nullable(),
+    assignmentId: z.union([z.string(), z.number()]).optional().nullable(),
+  })
+  .refine(
+    (data) => {
+      const hasExam = data.examId && data.examId !== "" && data.examId !== null;
+      const hasAssignment =
+        data.assignmentId &&
+        data.assignmentId !== "" &&
+        data.assignmentId !== null;
+
+      // Either exam or assignment must be selected, but not both
+      return (hasExam && !hasAssignment) || (!hasExam && hasAssignment);
+    },
+    {
+      message: "Please select either an exam or an assignment, but not both!",
+      path: ["examId"], // This will show the error on the exam field
+    }
+  );
+export type ResultSchema = z.infer<typeof resultSchema>;
