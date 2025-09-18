@@ -44,7 +44,16 @@ const FormContainer = async ({ table, type, data, id }: FormContainerProps) => {
         const classTeachers = await prisma.teacher.findMany({
           select: { id: true, name: true, surname: true },
         });
-        relatedData = { teachers: classTeachers, grades: classGrades };
+        const assignedSupervisors = await prisma.class.findMany({
+          where: { supervisorId: { not: null } },
+          select: { supervisorId: true },
+        });
+        const assignedSupervisorIds = assignedSupervisors.map(c => c.supervisorId).filter(Boolean);
+        relatedData = {
+          teachers: classTeachers,
+          grades: classGrades,
+          assignedSupervisors: assignedSupervisorIds,
+        };
         break;
 
       case "teacher":
