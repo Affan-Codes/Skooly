@@ -1,12 +1,16 @@
 import { Day } from "@prisma/client";
 import { z } from "zod";
 
+// SUBJECT
+
 export const subjectSchema = z.object({
   id: z.coerce.number().optional(),
   name: z.string().min(1, { message: "Subject name is required!" }),
   teachers: z.array(z.string()),
 });
 export type SubjectSchema = z.infer<typeof subjectSchema>;
+
+// CLASS
 
 export const classSchema = z.object({
   id: z.coerce.number().optional(),
@@ -16,6 +20,8 @@ export const classSchema = z.object({
   supervisorId: z.coerce.string().optional(),
 });
 export type ClassSchema = z.infer<typeof classSchema>;
+
+// TEACHER
 
 export const teacherSchema = z.object({
   id: z.string().optional(),
@@ -44,34 +50,32 @@ export const teacherSchema = z.object({
 });
 export type TeacherSchema = z.infer<typeof teacherSchema>;
 
+// STUDENT
+
 export const studentSchema = z.object({
   id: z.string().optional(),
-  username: z
-    .string()
-    .min(3, { message: "Username must be at least 3 characters long!" })
-    .max(20, { message: "Username must be at most 20 characters long!" }),
+  username: z.string().min(1, "Username is required!"),
   password: z
     .string()
     .min(8, { message: "Password must be at least 8 characters long!" })
     .optional()
     .or(z.literal("")),
-  name: z.string().min(1, { message: "First name is required!" }),
-  surname: z.string().min(1, { message: "Last name is required!" }),
-  email: z
-    .email({ message: "Invalid email address!" })
-    .optional()
-    .or(z.literal("")),
+  name: z.string().min(1, "First name is required!"),
+  surname: z.string().min(1, "Last name is required!"),
+  email: z.string().email("Invalid email!").optional().or(z.literal("")),
   phone: z.string().optional(),
-  address: z.string(),
+  address: z.string().min(1, "Address is required!"),
   img: z.string().optional(),
-  bloodType: z.string().min(1, { message: "Blood Type is required!" }),
-  birthday: z.coerce.date({ message: "Birthday is required!" }),
-  sex: z.enum(["MALE", "FEMALE"], { message: "Sex is required!" }),
-  gradeId: z.coerce.number().min(1, { message: "Grade is required!" }),
-  classId: z.coerce.number().min(1, { message: "Class is required!" }),
-  parentId: z.string().min(1, { message: "ParentId is required!" }),
+  bloodType: z.string().min(1, "Blood type is required!"),
+  sex: z.enum(["MALE", "FEMALE"]),
+  birthday: z.string().min(1, "Birthday is required!"), // Changed to string
+  gradeId: z.string().min(1, "Grade is required!"), // Changed to string
+  classId: z.string().min(1, "Class is required!"), // Changed to string
+  parentId: z.string().min(1, "Parent is required!"),
 });
 export type StudentSchema = z.infer<typeof studentSchema>;
+
+// EXAM
 
 export const examSchema = z
   .object({
@@ -228,3 +232,24 @@ export const resultSchema = z
     }
   );
 export type ResultSchema = z.infer<typeof resultSchema>;
+
+// PARENT
+
+export const parentSchema = z.object({
+  id: z.string().optional(),
+  username: z.string().min(3, "Username must be at least 3 characters!"),
+  password: z
+    .string()
+    .min(8, { message: "Password must be at least 8 characters long!" })
+    .optional()
+    .or(z.literal("")),
+  name: z.string().min(1, "First name is required!"),
+  surname: z.string().min(1, "Last name is required!"),
+  email: z
+    .union([z.string().email("Invalid email format!"), z.string().length(0)])
+    .optional()
+    .nullable(),
+  phone: z.string().min(1, "Phone number is required!"),
+  address: z.string().min(1, "Address is required!"),
+});
+export type ParentSchema = z.infer<typeof parentSchema>;
