@@ -1,3 +1,5 @@
+import prisma from "./prisma";
+
 const currentWorkWeek = () => {
   const today = new Date();
   const dayOfWeek = today.getDay();
@@ -85,6 +87,47 @@ export function formatDateTimeForInput(
 export const Capitalize = (str: string) => {
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
+
+export async function getAnnouncementsCount(user: any) {
+  if (!user) return 0;
+
+  const role = user.publicMetadata?.role as string;
+
+  switch (role) {
+    case "admin":
+      return await prisma.announcement.count();
+
+    case "teacher":
+      return await prisma.announcement.count({
+        where: {
+          class: {
+            supervisorId: user.id, // teacher supervises the class
+          },
+        },
+      });
+
+    case "student":
+      return await prisma.announcement.count({
+        where: {
+          classId: user.classId, // student belongs to a class
+        },
+      });
+
+    case "parent":
+      return await prisma.announcement.count({
+        where: {
+          class: {
+            students: {
+              some: { parentId: user.id }, // parent linked to student(s)
+            },
+          },
+        },
+      });
+
+    default:
+      return 0;
+  }
+}
 
 export type CurrentState = {
   success: boolean;
