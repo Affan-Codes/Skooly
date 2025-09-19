@@ -8,40 +8,40 @@ import UserCard from "@/components/UserCard";
 const AdminPage = async ({
   searchParams,
 }: {
-  searchParams: { [keys: string]: string | undefined };
+  searchParams: { [keys: string]: string | undefined; };
 }) => {
-  const params = await searchParams;
+  const params = searchParams;
 
   return (
     <div className="p-4 flex gap-4 flex-col md:flex-row">
-      {/* LEFT */}
+      {/* LEFT */ }
       <div className="w-full lg:w-2/3 flex flex-col gap-8">
-        {/* USER CARDS */}
+        {/* USER CARDS */ }
         <div className="flex gap-4 justify-between flex-wrap">
           <UserCard type="admin" />
           <UserCard type="teacher" />
           <UserCard type="student" />
           <UserCard type="parent" />
         </div>
-        {/* MIDDLE CHARTS */}
+        {/* MIDDLE CHARTS */ }
         <div className="flex gap-4 flex-col lg:flex-row">
-          {/* COUNT CHART */}
+          {/* COUNT CHART */ }
           <div className="w-full lg:w-1/3 h-[450px]">
             <CountChartContainer />
           </div>
-          {/* ATTENDANCE CHART */}
+          {/* ATTENDANCE CHART */ }
           <div className="w-full lg:w-2/3 h-[450px]">
             <AttendanceChartContainer />
           </div>
         </div>
-        {/* BOTTOM CHART */}
+        {/* BOTTOM CHART */ }
         <div className="w-full h-[500px]">
           <FinanceChart />
         </div>
       </div>
-      {/* RIGHT */}
+      {/* RIGHT */ }
       <div className="w-full lg:w-1/3 flex flex-col gap-8">
-        <EventCalendarContainer searchParams={params} />
+        <EventCalendarContainer searchParams={ params } />
         <Announcements />
       </div>
     </div>

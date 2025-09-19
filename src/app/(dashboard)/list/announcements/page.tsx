@@ -90,7 +90,7 @@ const AnnouncementListPage = async ({
     </tr>
   );
 
-  const params = await searchParams;
+  const params = searchParams;
   const { page, ...queryParams } = params;
 
   const p = page ? parseInt(page) : 1;
