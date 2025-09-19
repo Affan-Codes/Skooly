@@ -1,36 +1,131 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Skooly
 
-## Getting Started
+A modern **Next.js + TypeScript** based web application for managing school-related workflows.  
+The project is built with a modular structure, Prisma ORM, and reusable React components for scalability.
 
-First, run the development server:
+## 📑 Table of Contents
+
+- [About](#-about)
+- [Features](#-features)
+- [Tech Stack](#-tech-stack)
+- [Getting Started](#-getting-started)
+- [Available Scripts](#-available-scripts)
+- [Project Structure](#-project-structure)
+- [Contributing](#-contributing)
+
+## 📘 About
+
+Skooly is designed to simplify **school management** by providing:
+
+- Student records & class management
+- Grade tracking
+- Authentication (via Clerk)
+- Pagination & search for large datasets
+- Prisma-powered database layer
+
+## ✨ Features
+
+- ⚡ Built with **Next.js 14** (App Router)
+- 🔒 Authentication & session management with **Clerk**
+- 🗂 Database ORM using **Prisma**
+- 🎨 Reusable UI components with **TailwindCSS**
+- 🔍 Dynamic table search and pagination
+- 🖼 Optimized images via **Next/Image**
+
+## 🛠 Tech Stack
+
+- **Frontend:** Next.js, React, TypeScript, TailwindCSS
+- **Backend:** Next.js API Routes
+- **Database:** Prisma ORM (PostgreSQL)
+- **Auth:** Clerk
+- **Deployment:** Vercel / Render
+
+## 🚀 Getting Started
+
+### 1️⃣ Clone the repo
+
+```bash
+git clone https://github.com/your-username/Skooly.git
+cd Skooly
+```
+
+### 2️⃣ Install dependencies
+
+```bash
+npm install
+```
+
+### 3️⃣ Setup environment variables
+
+Create a .env file in the root:
+
+```bash
+DATABASE_URL="your-database-url"
+
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="your-clerk-publishable-key"
+CLERK_SECRET_KEY="your-clerk-secret-key"
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=/
+
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME="your-cloudinary-cloud-name"
+NEXT_PUBLIC_CLOUDINARY_API_KEY="your-cloudinary-api-key"
+CLOUDINARY_API_SECRET="your-cloudinary-api-secret"
+```
+
+### 4️⃣ Prisma setup
+
+```bash
+npx prisma generate
+npx prisma migrate dev
+```
+
+### 5️⃣ Run the development server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The app will be live at http://localhost:3000
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 📜 Available Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+From package.json:
 
-## Learn More
+```bash
+npm run dev – start development server
 
-To learn more about Next.js, take a look at the following resources:
+npm run build – build for production
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+npm run start – run production build
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+npx prisma studio – open Prisma database GUI
+```
 
-## Deploy on Vercel
+### 📂 Project Structure
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+Skooly/
+├── prisma/ # Prisma schema & migrations
+├── public/ # Static assets
+├── src/
+│ ├── app/ # Next.js App router
+│ ├── components/ # Reusable UI components
+│ ├── lib/ # Utilities (Prisma, settings)
+│ ├── styles/ # Global styles
+│ └── pages/ # Legacy Next.js pages (if any)
+├── package.json
+└── README.md
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 🤝 Contributing
+
+Contributions are welcome!
+
+- Fork the repo
+- Create a new branch (git checkout -b feature-name)
+- Commit changes (git commit -m 'Add feature')
+- Push (git push origin feature-name)
+- Open a Pull Request
+
+# 👨‍💻 Author
+
+Made by **_Affan Khan_**
