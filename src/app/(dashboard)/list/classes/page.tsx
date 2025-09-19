@@ -4,6 +4,7 @@ import Table from "@/components/Table";
 import TableSearch from "@/components/TableSearch";
 import prisma from "@/lib/prisma";
 import { ITEM_PER_PAGE } from "@/lib/settings";
+import { PageProps } from "@/lib/utils";
 import { auth } from "@clerk/nextjs/server";
 import { Class, Grade, Prisma, Teacher } from "@prisma/client";
 import Image from "next/image";
@@ -12,9 +13,7 @@ type ClassList = Class & { supervisor: Teacher; } & { grade: Grade; };
 
 const ClassListPage = async ({
   searchParams,
-}: {
-  searchParams: { [key: string]: string | undefined; };
-}) => {
+}: PageProps) => {
   const { userId, sessionClaims } = await auth();
   const role = (sessionClaims?.metadata as { role?: string; })?.role;
 

@@ -4,12 +4,11 @@ import CountChartContainer from "@/components/CountChartContainer";
 import EventCalendarContainer from "@/components/EventCalendarContainer";
 import FinanceChart from "@/components/FinanceChart";
 import UserCard from "@/components/UserCard";
+import { PageProps } from "@/lib/utils";
 
 const AdminPage = async ({
   searchParams,
-}: {
-  searchParams: { [keys: string]: string | undefined; };
-}) => {
+}: PageProps) => {
   const params = searchParams;
 
   return (

@@ -134,3 +134,7 @@ export type CurrentState = {
   error: boolean;
   message?: string;
 };
+
+export type PageProps = {
+  searchParams: { [key: string]: string | undefined };
+};
