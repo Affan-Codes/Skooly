@@ -9,7 +9,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-const SingleTeacherPage = async ({ params }: { params: { id: string; }; }) => {
+const SingleTeacherPage = async ({ params }: { params: Promise<{ id: string; }>; }) => {
   const { id } = await params;
 
   const { sessionClaims } = await auth();
