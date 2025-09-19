@@ -9,7 +9,7 @@ import { PageProps } from "@/lib/utils";
 const AdminPage = async ({
   searchParams,
 }: PageProps) => {
-  const params = searchParams;
+  const params = await searchParams;
 
   return (
     <div className="p-4 flex gap-4 flex-col md:flex-row">

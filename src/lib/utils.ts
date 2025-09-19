@@ -136,5 +136,5 @@ export type CurrentState = {
 };
 
 export type PageProps = {
-  searchParams: { [key: string]: string | undefined };
+  searchParams: Promise<{ [key: string]: string | undefined }>;
 };

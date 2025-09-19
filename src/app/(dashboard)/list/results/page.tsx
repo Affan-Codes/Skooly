@@ -118,7 +118,7 @@ const ResultListPage = async ({
     </tr>
   );
 
-  const params = searchParams;
+  const params = await searchParams;
   const { page, ...queryParams } = params;
 
   const p = page ? parseInt(page) : 1;
