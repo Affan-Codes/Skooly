@@ -21,3 +21,7 @@ export const routeAccessMap: RouteAccessMap = {
   "/list/events": ["admin", "teacher", "student", "parent"],
   "/list/announcements": ["admin", "teacher", "student", "parent"],
 };
+
+// "prisma": {
+//   "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
+// }
