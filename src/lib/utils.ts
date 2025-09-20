@@ -129,6 +129,16 @@ export async function getAnnouncementsCount(user: any) {
   }
 }
 
+export type Day = "MONDAY" | "TUESDAY" | "WEDNESDAY" | "THURSDAY" | "FRIDAY";
+
+export enum DayEnum {
+  MONDAY = "MONDAY",
+  TUESDAY = "TUESDAY",
+  WEDNESDAY = "WEDNESDAY",
+  THURSDAY = "THURSDAY",
+  FRIDAY = "FRIDAY",
+}
+
 export type CurrentState = {
   success: boolean;
   error: boolean;

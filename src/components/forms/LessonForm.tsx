@@ -15,8 +15,7 @@ import {
 } from "react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
-import { Day } from "@prisma/client";
-import { formatDateTimeForInput } from "@/lib/utils";
+import { DayEnum, formatDateTimeForInput } from "@/lib/utils";
 
 const LessonForm = ({
   type,
@@ -40,7 +39,7 @@ const LessonForm = ({
     resolver: zodResolver(lessonSchema) as Resolver<LessonSchema>,
     defaultValues: {
       name: data?.name || "",
-      day: data?.day || Day.MONDAY,
+      day: data?.day || DayEnum.MONDAY,
       startTime: formatDateTimeForInput(data?.startTime),
       endTime: formatDateTimeForInput(data?.endTime),
       subjectId: data?.subjectId?.toString() || "",
@@ -85,7 +84,7 @@ const LessonForm = ({
 
       // Auto-set day based on start time
       const dayOfWeek = start.getDay();
-      const dayMapping = [Day.MONDAY, Day.MONDAY, Day.TUESDAY, Day.WEDNESDAY, Day.THURSDAY, Day.FRIDAY, Day.MONDAY]; // Sunday maps to Monday
+      const dayMapping = [DayEnum.MONDAY, DayEnum.MONDAY, DayEnum.TUESDAY, DayEnum.WEDNESDAY, DayEnum.THURSDAY, DayEnum.FRIDAY, DayEnum.MONDAY]; // Sunday maps to Monday
       setValue("day", dayMapping[dayOfWeek]);
 
       // Auto-set end time (1 hour later) only for create mode
