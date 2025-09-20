@@ -4,7 +4,7 @@ import FormContainer from "@/components/FormContainer";
 import Performance from "@/components/Performance";
 import prisma from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
-import { Teacher } from "@prisma/client";
+import { Teacher } from "@/generated/prisma";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { DayEnum } from "./utils";
+import { Day } from "@/generated/prisma";
 
 // SUBJECT
 
@@ -143,7 +143,7 @@ export const lessonSchema = z
   .object({
     id: z.string().optional(),
     name: z.string().min(1, { message: "Lesson name is required!" }),
-    day: z.enum(DayEnum, { message: "Day is required!" }),
+    day: z.enum(Day, { message: "Day is required!" }),
     startTime: z.string().min(1, { message: "Start time is required!" }),
     endTime: z.string().min(1, { message: "End time is required!" }),
     subjectId: z.string().min(1, { message: "Subject is required!" }),

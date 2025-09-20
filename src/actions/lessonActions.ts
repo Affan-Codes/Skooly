@@ -1,20 +1,21 @@
 "use server";
 
+import { Day } from "@/generated/prisma";
 import { LessonSchema } from "@/lib/formValidationSchemas";
 import prisma from "@/lib/prisma";
-import { CurrentState, Day, DayEnum } from "@/lib/utils";
+import { CurrentState } from "@/lib/utils";
 
 // Helper function to get day from date
 const getDayFromDate = (date: Date): Day => {
   const dayOfWeek = date.getDay();
   const dayMapping = [
-    DayEnum.MONDAY,
-    DayEnum.MONDAY,
-    DayEnum.TUESDAY,
-    DayEnum.WEDNESDAY,
-    DayEnum.THURSDAY,
-    DayEnum.FRIDAY,
-    DayEnum.MONDAY,
+    Day.MONDAY,
+    Day.MONDAY,
+    Day.TUESDAY,
+    Day.WEDNESDAY,
+    Day.THURSDAY,
+    Day.FRIDAY,
+    Day.MONDAY,
   ];
   return dayMapping[dayOfWeek];
 };
