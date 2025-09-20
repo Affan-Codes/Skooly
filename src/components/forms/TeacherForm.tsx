@@ -50,7 +50,7 @@ const TeacherForm = ({
   const onSubmit = handleSubmit((formData) => {
     startTransition(() => {
       const imageUrl = img?.secure_url || formData.img || (data?.img ?? "");
-      formAction({ ...data, img: imageUrl });
+      formAction({ ...formData, img: imageUrl });
     });
   });
 
