@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { Day } from "@/generated/prisma";
+import { Day } from "@prisma/client";
 
 // SUBJECT
 

@@ -5,7 +5,7 @@ import Performance from "@/components/Performance";
 import StudentAttendanceCard from "@/components/StudentAttendanceCard";
 import prisma from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
-import { Class, Student } from "@/generated/prisma";
+import { Class, Student } from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -159,7 +159,7 @@ const SingleStudentPage = async ({ params }: { params: Promise<{ id: string; }>;
 
         {/* Bottom  */ }
         <div className="mt-4 bg-white rounded-md p-4 h-[800px]">
-          <h1>Student's Schedule</h1>
+          <h1>Student&apos;s Schedule</h1>
           <BigCalendarContainer type="classId" id={ student.class.id } />
         </div>
       </div>
@@ -173,31 +173,31 @@ const SingleStudentPage = async ({ params }: { params: Promise<{ id: string; }>;
               className="p-3 rounded-md bg-lamaSkyLight"
               href={ `/list/lessons?classId=${student.class.id}` }
             >
-              Student's Lessons
+              Student&apos;s Lessons
             </Link>
             <Link
               className="p-3 rounded-md bg-lamaPurpleLight"
               href={ `/list/teachers?classId=${student.class.id}` }
             >
-              Student's Teachers
+              Student&apos;s Teachers
             </Link>
             <Link
               className="p-3 rounded-md b bg-pink-50"
               href={ `/list/exams?classId=${student.class.id}` }
             >
-              Student's Exams
+              Student&apos;s Exams
             </Link>
             <Link
               className="p-3 rounded-md b bg-lamaSkyLight"
               href={ `/list/assignments?classId=${student.class.id}` }
             >
-              Student's Assignments
+              Student&apos;s Assignments
             </Link>
             <Link
               className="p-3 rounded-md b bg-lamaYellowLight"
               href={ `/list/results?studentId=${student.id}` }
             >
-              Student's Results
+              Student&apos;s Results
             </Link>
           </div>
         </div>

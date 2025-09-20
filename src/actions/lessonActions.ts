@@ -1,6 +1,6 @@
 "use server";
 
-import { Day } from "@/generated/prisma";
+import { Day } from "@prisma/client";
 import { LessonSchema } from "@/lib/formValidationSchemas";
 import prisma from "@/lib/prisma";
 import { CurrentState } from "@/lib/utils";

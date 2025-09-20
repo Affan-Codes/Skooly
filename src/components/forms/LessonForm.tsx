@@ -16,7 +16,7 @@ import {
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { formatDateTimeForInput } from "@/lib/utils";
-import { Day } from "@/generated/prisma";
+import { Day } from "@prisma/client";
 
 
 const LessonForm = ({
