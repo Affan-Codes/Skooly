@@ -69,7 +69,8 @@ const StudentForm = ({
 
   const onSubmit = handleSubmit((formData) => {
     startTransition(() => {
-      formAction({ ...formData, img: img?.secure_url || data.img });
+      const imageUrl = img?.secure_url || formData.img || (data?.img ?? "");
+      formAction({ ...formData, img: imageUrl });
     });
   });
 

@@ -47,9 +47,10 @@ const TeacherForm = ({
     error: false,
   });
 
-  const onSubmit = handleSubmit((data) => {
+  const onSubmit = handleSubmit((formData) => {
     startTransition(() => {
-      formAction({ ...data, img: img?.secure_url || data.img });
+      const imageUrl = img?.secure_url || formData.img || (data?.img ?? "");
+      formAction({ ...data, img: imageUrl });
     });
   });
 
